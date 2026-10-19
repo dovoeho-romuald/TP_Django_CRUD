@@ -1,0 +1,30 @@
+{% extends "capteurs/base.html" %}
+
+{% block titre %}Liste des capteurs{% endblock %}
+
+{% block contenu %}
+<h2>Liste des capteurs</h2>
+<p><a href="{% url 'capteurs:ajouter' %}">Ajouter un capteur</a></p>
+
+<form method="get">
+    {{ form.as_p }}
+    <button type="submit">Rechercher</button>
+    <a href="{% url 'capteurs:liste' %}">Réinitialiser</a>
+</form>
+
+
+{% if capteurs %}
+<table border="1">
+    <tr><th>Nom</th><th>Type</th><th>Actif</th></tr>
+    {% for capteur in capteurs %}
+    <tr>
+        <td><a href="{% url 'capteurs:detail' capteur.pk %}">{{ capteur.nom }}</a></td>
+        <td>{{ capteur.get_type_capteur_display }}</td>
+        <td>{{ capteur.actif|yesno:"Oui,Non" }}</td>
+    </tr>
+    {% endfor %}
+</table>
+{% else %}
+<p>Aucun capteur.</p>
+{% endif %}
+{% endblock %}

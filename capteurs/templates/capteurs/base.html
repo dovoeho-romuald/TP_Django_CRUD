@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8">
+    <title>{% block titre %}Capteurs IdO{% endblock %}</title>
+</head>
+<body>
+    <h1><a href="{% url 'capteurs:liste' %}">Inventaire des capteurs IdO</a></h1>
+
+    {% block contenu %}{% endblock %}
+</body>
+</html>

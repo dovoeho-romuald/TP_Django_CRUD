@@ -1,0 +1,15 @@
+{% extends "capteurs/base.html" %}
+
+{% block titre %}{{ capteur.nom }}{% endblock %}
+
+{% block contenu %}
+<h2>{{ capteur.nom }}</h2>
+<p>Type : {{ capteur.get_type_capteur_display }}</p>
+<p>Emplacement : {{ capteur.emplacement }}</p>
+<p>Actif : {{ capteur.actif|yesno:"Oui,Non" }}</p>
+<p>Description : {{ capteur.description|default:"(aucune)" }}</p>
+<p><a href="{% url 'capteurs:modifier' capteur.pk %}">Modifier</a></p>
+<p><a href="{% url 'capteurs:supprimer' capteur.pk %}">Supprimer</a></p>
+
+<p><a href="{% url 'capteurs:liste' %}">Retour à la liste</a></p>
+{% endblock %}

@@ -1,0 +1,15 @@
+# Environnement virtuel Python
+.venv/
+
+# Secrets : ne jamais envoyer la vraie clé
+.env
+
+# Cache Python
+__pycache__/
+*.pyc
+
+# Base de données locale (recréée avec migrate)
+db.sqlite3
+
+# Réglages personnels de l'éditeur
+.vscode/

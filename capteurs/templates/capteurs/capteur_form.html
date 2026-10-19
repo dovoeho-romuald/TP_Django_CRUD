@@ -1,0 +1,18 @@
+{% extends "capteurs/base.html" %}
+
+{% block titre %}{{ titre }}{% endblock %}
+
+{% block contenu %}
+<h2>{{ titre }}</h2>
+
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Enregistrer</button>
+    {% if form.instance.pk %}
+        <a href="{% url 'capteurs:detail' form.instance.pk %}">Annuler</a>
+    {% else %}
+        <a href="{% url 'capteurs:liste' %}">Annuler</a>
+    {% endif %}
+</form>
+{% endblock %}
