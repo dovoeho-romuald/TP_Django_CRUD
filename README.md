@@ -13,6 +13,19 @@ python -m venv .venv
 .venv\Scripts\python.exe -m pip install -r requirements.txt
 ```
 
+## Clé secrète (fichier .env)
+
+La `SECRET_KEY` de Django n'est pas dans le code : elle est lue dans un fichier `.env` (non versionné, ignoré par `.gitignore`). Avant le premier lancement :
+
+1. Copier le modèle : `Copy-Item .env.example .env`
+2. Générer une clé :
+   ```
+   .venv\Scripts\python.exe -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"
+   ```
+3. Coller cette clé dans `.env` à la place de `remplacer-par-une-cle-secrete`.
+
+Sans ce fichier, Django s'arrête avec `KeyError: 'DJANGO_SECRET_KEY'`.
+
 ## Migrations
 
 La base `db.sqlite3` n'est pas incluse dans l'archive. Pour la recréer :
@@ -59,6 +72,34 @@ Puis ouvrir http://127.0.0.1:8000/capteurs/ (la racine `/` retourne 404, c'est n
 | `/capteurs/<pk>/modifier/` | `capteurs:modifier` | Formulaire prérempli | Mise à jour |
 | `/capteurs/<pk>/supprimer/` | `capteurs:supprimer` | Confirmation | Suppression |
 
+## API REST (branche `capteurs-API`)
+
+Construite avec Django REST Framework, en lecture seule : seules les requêtes GET sont acceptées (un POST répond 405). Les réponses sont en JSON; ouvertes dans un navigateur, elles s'affichent dans l'interface navigable de DRF.
+
+| Endpoint (GET) | Résultat |
+|---|---|
+| `/api/capteurs/` | Tous les capteurs, triés par nom |
+| `/api/capteurs/<pk>/` | Un capteur (404 si l'ID n'existe pas) |
+| `/api/capteurs/temperature/` | Capteurs de la catégorie Température (`T`) |
+| `/api/capteurs/humidite/` | Capteurs de la catégorie Humidité (`H`) |
+| `/api/capteurs/pression/` | Capteurs de la catégorie Pression (`P`) |
+
+Exemple de réponse pour un capteur :
+
+```json
+{
+    "id": 1,
+    "nom": "Temp-Serre",
+    "type_capteur": "T",
+    "type_libelle": "Température",
+    "emplacement": "Serre A",
+    "actif": true,
+    "description": "Surveillance de la serre"
+}
+```
+
+Fichiers concernés : `capteurs/serializers.py` (`CapteurSerializer`), les vues `api_*` à la fin de `capteurs/views.py`, et les routes `api/` dans `inventaire_iot/urls.py`.
+
 ## Tests (scénarios 11 et 12)
 
 ```
@@ -67,10 +108,10 @@ Puis ouvrir http://127.0.0.1:8000/capteurs/ (la racine `/` retourne 404, c'est n
 
 Les tests utilisent une base temporaire séparée : les fiches de travail ne sont pas modifiées.
 
-## Contenu de l'archive
+## Contenu du dépôt
 
-- `inventaire_iot/`, `capteurs/` (code, migrations, gabarits dans `capteurs/templates/capteurs/`, tests)
-- `requirements.txt`, `README.md`
+- `inventaire_iot/`, `capteurs/` (code, migrations, gabarits dans `capteurs/templates/capteurs/`, tests, API)
+- `requirements.txt`, `README.md`, `.env.example` (modèle du fichier `.env`), `.gitignore`
 - `OBSERVATIONS.md` : les 12 scénarios de vérification
 - `REPONSES.md` : les 6 questions de compréhension
 - `captures/` : liste avec recherche, fiche détaillée, formulaire invalide, confirmation de suppression, sortie des tests

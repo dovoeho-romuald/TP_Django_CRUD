@@ -3,6 +3,12 @@ from django.shortcuts import render, get_object_or_404, redirect
 from .models import Capteur
 from .forms import RechercheCapteurForm, CapteurForm
 
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+
+from .serializers import CapteurSerializer
+
+
 def capteur_ajouter(request):
     if request.method == "POST":
         form = CapteurForm(request.POST)
@@ -75,4 +81,26 @@ def capteur_supprimer(request, pk):
     return render(request, "capteurs/capteur_confirmer_suppression.html", {
         "capteur": capteur,
     })
+
+#      API (lecture seule : GET)
+
+@api_view(["GET"])
+def api_capteur_liste(request):
+    capteurs = Capteur.objects.order_by("nom")
+    serializer = CapteurSerializer(capteurs, many=True)
+    return Response(serializer.data)
+
+
+@api_view(["GET"])
+def api_capteur_detail(request, pk):
+    capteur = get_object_or_404(Capteur, pk=pk)
+    serializer = CapteurSerializer(capteur)
+    return Response(serializer.data)
+
+
+@api_view(["GET"])
+def api_capteurs_par_type(request, code):
+    capteurs = Capteur.objects.filter(type_capteur=code).order_by("nom")
+    serializer = CapteurSerializer(capteurs, many=True)
+    return Response(serializer.data)
 
