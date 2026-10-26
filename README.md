@@ -74,9 +74,9 @@ Puis ouvrir http://127.0.0.1:8000/capteurs/ (la racine `/` retourne 404, c'est n
 
 ## API REST (branche `capteurs-API`)
 
-Construite avec Django REST Framework, en lecture seule : seules les requêtes GET sont acceptées (un POST répond 405). Les réponses sont en JSON; ouvertes dans un navigateur, elles s'affichent dans l'interface navigable de DRF.
+Construite avec Django REST Framework. CRUD complet sur les capteurs (voir « Méthodes acceptées »); les endpoints de catégorie sont en lecture seule. Les réponses sont en JSON; ouvertes dans un navigateur, elles s'affichent dans l'interface navigable de DRF.
 
-| Endpoint (GET) | Résultat |
+| Endpoint (lecture GET) | Résultat |
 |---|---|
 | `/api/capteurs/` | Tous les capteurs, triés par nom |
 | `/api/capteurs/<pk>/` | Un capteur (404 si l'ID n'existe pas) |
@@ -99,6 +99,22 @@ Exemple de réponse pour un capteur :
 ```
 
 Fichiers concernés : `capteurs/serializers.py` (`CapteurSerializer`), les vues `api_*` à la fin de `capteurs/views.py`, et les routes `api/` dans `inventaire_iot/urls.py`.
+
+### Méthodes acceptées
+
+| Endpoint | Méthodes | Réponses |
+|---|---|---|
+| `/api/capteurs/` | GET (lire), POST (créer) | 200, 201, 400 |
+| `/api/capteurs/<pk>/` | GET (lire), PUT (modifier tout), PATCH (modifier une partie), DELETE (supprimer) | 200, 204, 400, 404 |
+| `/api/capteurs/temperature/`, `/humidite/`, `/pression/` | GET seulement | 200 (autre méthode : 405) |
+
+### Tests avec Postman
+
+Le fichier `API_Capteurs_IdO.postman_collection.json` contient les 12 requêtes de test (GET, POST, PUT, PATCH, DELETE, cas d'erreur 400, 404 et 405).
+
+1. Lancer le serveur : `.venv\Scripts\python.exe manage.py runserver`
+2. Dans Postman : **Import**, puis choisir le fichier `API_Capteurs_IdO.postman_collection.json`.
+3. Exécuter les requêtes dans l'ordre (01 à 12). La requête 07 (POST) mémorise l'id du capteur créé; les requêtes 09 à 11 (PUT, PATCH, DELETE) l'utilisent.
 
 ## Tests (scénarios 11 et 12)
 

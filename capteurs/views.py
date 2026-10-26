@@ -5,6 +5,8 @@ from .forms import RechercheCapteurForm, CapteurForm
 
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from rest_framework import status
+
 
 from .serializers import CapteurSerializer
 
@@ -81,21 +83,48 @@ def capteur_supprimer(request, pk):
     return render(request, "capteurs/capteur_confirmer_suppression.html", {
         "capteur": capteur,
     })
-
-#      API (lecture seule : GET)
-
-@api_view(["GET"])
+@api_view(["GET", "POST"])
 def api_capteur_liste(request):
+    if request.method == "POST":
+        # C : créer un capteur à partir du JSON reçu
+        serializer = CapteurSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    # R : lire tous les capteurs
     capteurs = Capteur.objects.order_by("nom")
     serializer = CapteurSerializer(capteurs, many=True)
     return Response(serializer.data)
 
-
-@api_view(["GET"])
+        #API REST CRUD Complet
+        
+@api_view(["GET", "PUT", "PATCH", "DELETE"])
 def api_capteur_detail(request, pk):
     capteur = get_object_or_404(Capteur, pk=pk)
+
+    if request.method in ("PUT", "PATCH"):
+        # U : modifier ce capteur (PUT = tous les champs, PATCH = seulement ceux envoyés)
+        serializer = CapteurSerializer(
+            capteur,
+            data=request.data,
+            partial=(request.method == "PATCH"),
+        )
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    if request.method == "DELETE":
+        # D : supprimer ce capteur
+        capteur.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+    # R : lire ce capteur
     serializer = CapteurSerializer(capteur)
     return Response(serializer.data)
+
 
 
 @api_view(["GET"])
